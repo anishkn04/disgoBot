@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
+	"strconv"
+	"time"
 
 	"os/signal"
 
@@ -25,24 +28,40 @@ func main() {
 
 	discord.Open()
 	fmt.Println("Bot running....")
-	
+
 	var sentMessages []string //Slices of Events-Content
-	go sendEmbeds(fetcher.Fetch(), discord, sentMessages)
-	
+
+	// Create a new ticker that triggers every hour
+	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"));
+	if err != nil {
+		log.Fatal("Wrong Wait Time Value")
+	}
+	ticker := time.NewTicker(time.Duration(waittime) * time.Minute)
+	defer ticker.Stop()
+
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				// Fetch and send embeds every hour
+				sendEmbeds(fetcher.Fetch(), discord, &sentMessages)
+			}
+		}
+	}()
+
 	defer discord.Close()
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
 }
 
-func sendEmbeds(fetchedData fetcher.ResponseBody, discord *discordgo.Session, sentMessages []string) {
-	EVENTSCHANNELID := os.Getenv("CHANNELID");
+func sendEmbeds(fetchedData fetcher.ResponseBody, discord *discordgo.Session, sentMessages *[]string) {
+	EVENTSCHANNELID := os.Getenv("CHANNELID")
 	existingMessages := []string{}
 	if sentMessages != nil {
-		existingMessages = sentMessages
+		existingMessages = *sentMessages
 	}
 	fmt.Println("Existing Messages: ", existingMessages)
-
 	for _, event := range fetchedData.Events {
 		eventBannerURL := "https://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/" + event.Banner
 		embedMessage := discordgo.MessageEmbed{
@@ -52,12 +71,15 @@ func sendEmbeds(fetchedData fetcher.ResponseBody, discord *discordgo.Session, se
 			Description: event.Description,
 			Timestamp:   event.Start_date,
 		}
-
-		sentMessage, err := discord.ChannelMessageSendEmbed(EVENTSCHANNELID, &embedMessage)
-		if err != nil {
-			fmt.Println(err);
+		if slices.Contains(existingMessages, embedMessage.Title) {
+			fmt.Println("Announcement with title:", embedMessage.Title, "already exists. If this was a mistake, edit and try again!");
+			continue
 		}
-		fmt.Println("Sent Message: ", sentMessage)
+		_, err := discord.ChannelMessageSendEmbed(EVENTSCHANNELID, &embedMessage)
+		if err != nil {
+			fmt.Println(err)
+		}
+		existingMessages = append(existingMessages, embedMessage.Title)
 	}
-	// return existingMessages
+	*sentMessages = existingMessages
 }
