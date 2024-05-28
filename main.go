@@ -36,7 +36,7 @@ func main() {
 }
 
 func sendEmbeds(fetchedData fetcher.ResponseBody, discord *discordgo.Session, sentMessages []string) {
-	EVENTSCHANNELID := "1244872561867755593"
+	EVENTSCHANNELID := os.Getenv("CHANNELID");
 	existingMessages := []string{}
 	if sentMessages != nil {
 		existingMessages = sentMessages
