@@ -1,9 +1,7 @@
 package main
 
 import (
-	// "encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"slices"
 	"strconv"
@@ -14,7 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
 
-	fetcher "disgoBot/fetcher"
+	methods "disgoBot/methods"
 )
 
 func main() {
@@ -22,20 +20,15 @@ func main() {
 	TOKEN := os.Getenv("BOTTOKEN")
 
 	discord, err := discordgo.New("Bot " + TOKEN)
-	if err != nil {
-		log.Fatal("Couldn't start!")
-	}
+	methods.Check(err);
 
 	discord.Open()
 	fmt.Println("Bot running....")
 
-	var sentMessages []string //Slices of Events-Content
-
-	// Create a new ticker that triggers every hour
+	// Create a new ticker that triggers every "WAITTIME" minutes
 	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"));
-	if err != nil {
-		log.Fatal("Wrong Wait Time Value")
-	}
+	methods.Check(err);
+
 	ticker := time.NewTicker(time.Duration(waittime) * time.Minute)
 	defer ticker.Stop()
 
@@ -43,8 +36,8 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				// Fetch and send embeds every hour
-				sendEmbeds(fetcher.Fetch(), discord, &sentMessages)
+				// Fetch and send embeds every "WAITTIME" minutes
+				sendEmbeds(methods.Fetch(), discord, methods.ReadStoredData())
 			}
 		}
 	}()
@@ -55,7 +48,7 @@ func main() {
 	<-c
 }
 
-func sendEmbeds(fetchedData fetcher.ResponseBody, discord *discordgo.Session, sentMessages *[]string) {
+func sendEmbeds(fetchedData methods.ResponseBody, discord *discordgo.Session, sentMessages *[]string) {
 	EVENTSCHANNELID := os.Getenv("CHANNELID")
 	existingMessages := []string{}
 	if sentMessages != nil {
@@ -76,10 +69,11 @@ func sendEmbeds(fetchedData fetcher.ResponseBody, discord *discordgo.Session, se
 			continue
 		}
 		_, err := discord.ChannelMessageSendEmbed(EVENTSCHANNELID, &embedMessage)
-		if err != nil {
-			fmt.Println(err)
+		fmt.Println(err);
+		if(err==nil){
+			existingMessages = append(existingMessages, embedMessage.Title)
 		}
-		existingMessages = append(existingMessages, embedMessage.Title)
 	}
 	*sentMessages = existingMessages
+	methods.WriteStoredData(*sentMessages)
 }

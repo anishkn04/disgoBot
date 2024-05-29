@@ -1,10 +1,10 @@
-package fetcher
+package methods
 
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
+	
 )
 
 type Event struct{
@@ -23,13 +23,11 @@ type ResponseBody struct{
 
 func Fetch() ResponseBody{
 	resp, err := http.Get("https://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/resources/json/events.json");
-	if err != nil {
-		log.Fatal(err)
-	}
+	Check(err);
+
 	respBody, err := io.ReadAll(resp.Body);
-	if err != nil{
-		log.Fatal("Couldn't Read Data")
-	}
+	Check(err);
+
 	var jsonData ResponseBody;
 	json.Unmarshal(respBody, &jsonData)
 
