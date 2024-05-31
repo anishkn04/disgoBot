@@ -6,17 +6,16 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/joho/godotenv"
-	
 	methods "disgoBot/methods"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	godotenv.Load()
-
-	// Create a new ticker that triggers every "WAITTIME" minutes
-	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"));
-	methods.Check(err);
+	err := godotenv.Load()
+	// Create a new ticker that triggers every "WAITTIME" seconds
+	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"))
+	methods.Check(err)
 
 	ticker := time.NewTicker(time.Duration(waittime) * time.Second)
 	defer ticker.Stop()
@@ -25,7 +24,8 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				// Fetch and send embeds every "WAITTIME" minutes
+				//Fetch and send embeds every "WAITTIME" minutes
+				methods.SendFacebook(methods.Fetch(), methods.ReadStoredData())
 				methods.SendEmbeds(methods.Fetch(), methods.ReadStoredData())
 			}
 		}
