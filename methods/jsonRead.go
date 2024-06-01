@@ -13,10 +13,18 @@ type Titles struct {
 }
 
 func ReadJson() ([]string, []string) {
-	CreateJsonIfNotExist()
+	// CreateJsonIfNotExist()
 	var title Titles
 	file, err := os.Open("events.json")
-	Check(err)
+	if err != nil {
+		if err.Error() == "open events.json: The system cannot find the file specified." {
+			CreateJsonIfNotExist();
+			file, err = os.Open("events.json")
+			Check(err);
+		}else{
+			Check(err);
+		}
+	}
 	result, err := io.ReadAll(file)
 	Check(err)
 	json.Unmarshal(result, &title)

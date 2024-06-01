@@ -27,10 +27,11 @@ func main() {
 			select {
 			case <-ticker.C:
 				publishedTitlesDiscord, publishedTitlesFacebook := methods.ReadJson()
-				fmt.Println("Discord Ko:", publishedTitlesDiscord)
-				fmt.Println("FB ko: ", publishedTitlesFacebook)
-				methods.SendFacebook(methods.Fetch(), publishedTitlesFacebook)
-				methods.SendEmbeds(methods.Fetch(), publishedTitlesDiscord)
+				fetchedData := methods.Fetch();
+				fmt.Println("Discord:", publishedTitlesDiscord)
+				fmt.Println("FB: ", publishedTitlesFacebook)
+				go methods.SendFacebook(fetchedData, publishedTitlesFacebook)
+				go methods.SendEmbeds(fetchedData, publishedTitlesDiscord)
 			}
 		}
 	}()
