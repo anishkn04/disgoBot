@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"strconv"
@@ -13,6 +14,7 @@ import (
 
 func main() {
 	err := godotenv.Load()
+	methods.Check(err)
 	// Create a new ticker that triggers every "WAITTIME" seconds
 	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"))
 	methods.Check(err)
@@ -24,9 +26,11 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				//Fetch and send embeds every "WAITTIME" minutes
-				methods.SendFacebook(methods.Fetch(), methods.ReadStoredData())
-				methods.SendEmbeds(methods.Fetch(), methods.ReadStoredData())
+				publishedTitlesDiscord, publishedTitlesFacebook := methods.ReadJson()
+				fmt.Println("Discord Ko:", publishedTitlesDiscord)
+				fmt.Println("FB ko: ", publishedTitlesFacebook)
+				methods.SendFacebook(methods.Fetch(), publishedTitlesFacebook)
+				methods.SendEmbeds(methods.Fetch(), publishedTitlesDiscord)
 			}
 		}
 	}()
