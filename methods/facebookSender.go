@@ -7,33 +7,29 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"slices"
 
 	"github.com/joho/godotenv"
 )
 
-func SendFacebook(fetchedData ResponseBody, sentMessages *[]string) {
+func SendFacebook(fetchedData ResponseBody, titles []string) {
+
 	err := godotenv.Load()
 	Check(err)
 	pageId := os.Getenv("page_id")
 	pageAccessToken := os.Getenv("page_access_token")
 	fmt.Println("ID: ", pageId)
 	fmt.Println("Token: ", pageAccessToken)
-	existingMessages := []string{}
-	if sentMessages != nil {
-		existingMessages = *sentMessages
-	}
-	fmt.Println("Existing Messages: ", existingMessages)
+
 	for _, event := range fetchedData.Events {
+		if checkIfExists(titles, event.Title) {
+			continue
+		}
+
 		message := fmt.Sprintf("Event Title: %s\nStart Date: %s\nEnd Date: %s\nLocation: %s\nDescription: %s\n", event.Title, event.Start_date, event.End_date, event.Location, event.Description)
 		postData := map[string]interface{}{
 			"url":          "https://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/" + event.Banner,
 			"message":      message,
 			"access_token": pageAccessToken,
-		}
-		if slices.Contains(existingMessages, event.Title) {
-			fmt.Println("Already Announced")
-			continue
 		}
 
 		jsonData, err := json.Marshal(postData)
@@ -56,13 +52,21 @@ func SendFacebook(fetchedData ResponseBody, sentMessages *[]string) {
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
 			fmt.Printf("Error: received non-200 status code %d\nResponse: %s\n", resp.StatusCode, body)
-
+			continue
 		}
-		// if err == nil {
-		// 	existingMessages = append(existingMessages, event.Title)
-		// }
-		// *sentMessages = existingMessages
-		// WriteStoredData(*sentMessages)
 
+		if resp.StatusCode == http.StatusOK {
+			writeIntoJson(event.Title, "facebook")
+		}
 	}
+
+}
+
+func checkIfExists(arr []string, search string) bool {
+	for _, item := range arr {
+		if item == search {
+			return true
+		}
+	}
+	return false
 }
