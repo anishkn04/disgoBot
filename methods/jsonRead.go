@@ -35,7 +35,7 @@ func ReadJson() ([]string, []string) {
 
 func CreateJsonIfNotExist() {
 	if fileExists("events.json") {
-		fmt.Println("Exists you idiot!")
+		fmt.Println("Already exists!")
 		return
 	}
 
