@@ -30,8 +30,8 @@ func main() {
 				fetchedData := methods.Fetch();
 				fmt.Println("Discord:", publishedTitlesDiscord)
 				fmt.Println("FB: ", publishedTitlesFacebook)
-				go methods.SendFacebook(*fetchedData, &publishedTitlesFacebook)
-				go methods.SendEmbeds(*fetchedData, &publishedTitlesDiscord)
+				methods.SendFacebook(*fetchedData, &publishedTitlesFacebook)
+				methods.SendEmbeds(*fetchedData, &publishedTitlesDiscord)
 			}
 		}
 	}()
