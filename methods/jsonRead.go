@@ -18,15 +18,15 @@ func ReadJson() ([]string, []string) {
 	file, err := os.Open("events.json")
 	if err != nil {
 		if err.Error() == "open events.json: The system cannot find the file specified." {
-			CreateJsonIfNotExist();
+			CreateJsonIfNotExist()
 			file, err = os.Open("events.json")
-			Check(err);
-		}else{
-			Check(err);
+			Check(&err)
+		} else {
+			Check(&err)
 		}
 	}
 	result, err := io.ReadAll(file)
-	Check(err)
+	Check(&err)
 	json.Unmarshal(result, &title)
 	tDiscord := title.DiscordTitles[:]
 	tFacebook := title.FacebookTitles[:]

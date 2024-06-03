@@ -20,16 +20,16 @@ type ResponseBody struct {
 	Events []Event `json:"events"`
 }
 
-func Fetch() ResponseBody {
+func Fetch() *ResponseBody {
 	resp, err := http.Get("http://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/resources/json/events.json")
-	Check(err)
+	Check(&err)
 
 	respBody, err := io.ReadAll(resp.Body)
-	Check(err)
+	Check(&err)
 
 	var jsonData ResponseBody
 	json.Unmarshal(respBody, &jsonData)
 
 	defer resp.Body.Close()
-	return jsonData
+	return &jsonData
 }

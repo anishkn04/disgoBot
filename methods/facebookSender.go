@@ -11,19 +11,19 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func SendFacebook(fetchedData ResponseBody, titles []string) {
+func SendFacebook(fetchedData ResponseBody, titles *[]string) {
 
 	err := godotenv.Load()
-	Check(err)
+	Check(&err)
 	pageId := os.Getenv("page_id")
 	pageAccessToken := os.Getenv("page_access_token")
 
 	for _, event := range fetchedData.Events {
-		if checkIfExists(titles, event.Title) {
+		if checkIfExists(*titles, event.Title) {
 			continue
 		}
 
-		message := fmt.Sprintf("Event Title: %s\nStart Date: %s\nEnd Date: %s\nLocation: %s\nDescription: %s\n", event.Title, event.Start_date, event.End_date, event.Location, event.Description)
+		message := fmt.Sprintf("%s\n\nDescription: %s\n\nDate: %s to %s\nLocation: %s", event.Title, event.Description, event.Start_date, event.End_date, event.Location)
 		postData := map[string]interface{}{
 			"url":          "https://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/" + event.Banner,
 			"message":      message,
@@ -31,20 +31,20 @@ func SendFacebook(fetchedData ResponseBody, titles []string) {
 		}
 
 		jsonData, err := json.Marshal(postData)
-		Check(err)
+		Check(&err)
 
 		url := fmt.Sprintf("https://graph.facebook.com/v20.0/%s/photos", pageId)
 
 		fmt.Print(url)
 
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
-		Check(err)
+		Check(&err)
 
 		req.Header.Set("Content-Type", "application/json")
 
 		client := &http.Client{}
 		resp, err := client.Do(req)
-		Check(err)
+		Check(&err)
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
@@ -53,18 +53,7 @@ func SendFacebook(fetchedData ResponseBody, titles []string) {
 			continue
 		}
 
-		if resp.StatusCode == http.StatusOK {
-			writeIntoJson(event.Title, "facebook")
-		}
+		writeIntoJson(&event.Title, "facebook")
 	}
 
-}
-
-func checkIfExists(arr []string, search string) bool {
-	for _, item := range arr {
-		if item == search {
-			return true
-		}
-	}
-	return false
 }

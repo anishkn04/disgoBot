@@ -8,18 +8,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func SendEmbeds(fetchedData ResponseBody, title []string) {
+func SendEmbeds(fetchedData ResponseBody, title *[]string) {
 	godotenv.Load()
 	TOKEN := os.Getenv("BOTTOKEN")
 	discord, err := discordgo.New("Bot " + TOKEN)
-	Check(err)
+	Check(&err)
 
 	discord.Open()
 	fmt.Println("Bot running....")
 	EVENTSCHANNELID := os.Getenv("CHANNELID")
 
 	for _, event := range fetchedData.Events {
-		if checkIfExists(title, event.Title) {
+		if checkIfExists(*title, event.Title) {
 			continue
 		}
 
@@ -33,9 +33,9 @@ func SendEmbeds(fetchedData ResponseBody, title []string) {
 		}
 
 		_, err := discord.ChannelMessageSendEmbed(EVENTSCHANNELID, &embedMessage)
-		Check(err)
+		Check(&err)
 		if err == nil {
-			writeIntoJson(event.Title, "discord")
+			writeIntoJson(&event.Title, "discord")
 		}
 
 	}
