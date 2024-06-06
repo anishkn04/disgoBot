@@ -1,4 +1,4 @@
-**This CLI application**, created for the *Nepal Tek Community (NTC)* and available for others, fetches data from publicly available website. It regularly checks for new events and posts updates when they are available. These updates are posted on both Discord and Facebook. The bot ensures that community members are always informed about the latest events. It streamlines event notifications across multiple platforms.
+**This CLI application**, fetches data from publicly available website or a file in the same directory. It regularly checks for new events and posts updates when they are available. These updates are posted on both Discord and Facebook. The bot ensures that community members are always informed about the latest events. It streamlines event notifications across multiple platforms.
 
 ---
 
@@ -60,6 +60,9 @@ Additionally, ensure that the events on the website are formatted as follows for
             "location": "",
             "description": "",
             "link": ""
-        }
+        },
+        {
+            ...
+        },
     ]
 }
