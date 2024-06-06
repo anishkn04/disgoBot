@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -25,13 +26,21 @@ type ResponseBody struct {
 
 func Fetch() *ResponseBody {
 	err := godotenv.Load(".env")
-	resp, err := http.Get(os.Getenv("SITE"));
+	siteLink := os.Getenv("SITE")
+	var jsonData ResponseBody
+	if !strings.Contains(siteLink, "http") {
+		file, err := os.Open(siteLink)
+		result, err := io.ReadAll(file)
+		Check(&err)
+		json.Unmarshal(result, &jsonData)
+		return &jsonData
+	}
+	resp, err := http.Get(siteLink)
 	Check(&err)
 
 	respBody, err := io.ReadAll(resp.Body)
 	Check(&err)
 
-	var jsonData ResponseBody
 	json.Unmarshal(respBody, &jsonData)
 
 	defer resp.Body.Close()
