@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	methods.Check(&err)
+	methods.CheckEnv();
+	err := godotenv.Load(".env")
 	// Create a new ticker that triggers every "WAITTIME" seconds
 	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"))
 	methods.Check(&err)

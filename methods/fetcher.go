@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Event struct {
@@ -21,7 +24,8 @@ type ResponseBody struct {
 }
 
 func Fetch() *ResponseBody {
-	resp, err := http.Get("http://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/resources/json/events.json")
+	err := godotenv.Load(".env")
+	resp, err := http.Get(os.Getenv("SITE"));
 	Check(&err)
 
 	respBody, err := io.ReadAll(resp.Body)

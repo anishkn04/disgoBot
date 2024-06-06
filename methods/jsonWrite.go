@@ -6,7 +6,7 @@ import (
 )
 
 func writeIntoJson(event *string, social string) {
-	jsonData, err := os.ReadFile("events.json")
+	jsonData, err := os.ReadFile("sentEvents.json")
 	Check(&err)
 	var title Titles
 	err = json.Unmarshal(jsonData, &title)
@@ -20,7 +20,7 @@ func writeIntoJson(event *string, social string) {
 	}
 	updatedData, err := json.MarshalIndent(title, "", "    ")
 	Check(&err)
-	err = os.WriteFile("events.json", updatedData, 0644)
+	err = os.WriteFile("sentEvents.json", updatedData, 0644)
 	Check(&err)
 
 }

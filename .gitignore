@@ -1,3 +1,4 @@
 .env
+sentEvents.json
 events.json
 logs.txt

@@ -15,11 +15,11 @@ type Titles struct {
 func ReadJson() ([]string, []string) {
 	// CreateJsonIfNotExist()
 	var title Titles
-	file, err := os.Open("events.json")
+	file, err := os.Open("sentEvents.json")
 	if err != nil {
-		if err.Error() == "open events.json: The system cannot find the file specified." {
+		if err.Error() == "open sentEvents.json: The system cannot find the file specified." {
 			CreateJsonIfNotExist()
-			file, err = os.Open("events.json")
+			file, err = os.Open("sentEvents.json")
 			Check(&err)
 		} else {
 			Check(&err)
@@ -34,7 +34,7 @@ func ReadJson() ([]string, []string) {
 }
 
 func CreateJsonIfNotExist() {
-	if fileExists("events.json") {
+	if fileExists("sentEvents.json") {
 		fmt.Println("Already exists!")
 		return
 	}
@@ -44,7 +44,7 @@ func CreateJsonIfNotExist() {
 		"facebook": {},
 	}
 
-	file, err := os.Create("events.json")
+	file, err := os.Create("sentEvents.json")
 	if err != nil {
 		fmt.Println("Error creating file", err)
 		return

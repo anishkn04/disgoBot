@@ -15,8 +15,8 @@ func SendFacebook(fetchedData ResponseBody, titles *[]string) {
 
 	err := godotenv.Load()
 	Check(&err)
-	pageId := os.Getenv("page_id")
-	pageAccessToken := os.Getenv("page_access_token")
+	pageId := os.Getenv("PAGE_ID")
+	pageAccessToken := os.Getenv("PAGE_ACCESS_TOKEN")
 
 	for _, event := range fetchedData.Events {
 		if checkIfExists(*titles, event.Title) {
