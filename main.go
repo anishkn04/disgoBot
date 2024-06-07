@@ -13,8 +13,9 @@ import (
 )
 
 func main() {
-	methods.CheckEnv();
+	methods.CheckEnv()
 	err := godotenv.Load(".env")
+	methods.Check(&err)
 	// Create a new ticker that triggers every "WAITTIME" seconds
 	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"))
 	methods.Check(&err)
@@ -23,16 +24,13 @@ func main() {
 	defer ticker.Stop()
 
 	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				publishedTitlesDiscord, publishedTitlesFacebook := methods.ReadJson()
-				fetchedData := methods.Fetch();
-				fmt.Println("Discord:", publishedTitlesDiscord)
-				fmt.Println("FB: ", publishedTitlesFacebook)
-				methods.SendFacebook(*fetchedData, &publishedTitlesFacebook)
-				methods.SendEmbeds(*fetchedData, &publishedTitlesDiscord)
-			}
+		for range ticker.C {
+			publishedTitlesDiscord, publishedTitlesFacebook := methods.ReadJson()
+			fetchedData := methods.Fetch()
+			fmt.Println("Discord:", publishedTitlesDiscord)
+			fmt.Println("FB: ", publishedTitlesFacebook)
+			methods.SendFacebook(*fetchedData, &publishedTitlesFacebook)
+			methods.SendEmbeds(*fetchedData, &publishedTitlesDiscord)
 		}
 	}()
 
