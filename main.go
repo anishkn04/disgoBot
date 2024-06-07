@@ -12,6 +12,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type appsToUse int
+const (
+	FACEBOOK appsToUse = 1
+	DISCORD  appsToUse = 2
+	BOTH     appsToUse = -1
+)
+
 func main() {
 	methods.CheckEnv()
 	err := godotenv.Load(".env")
@@ -20,21 +27,35 @@ func main() {
 	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"))
 	methods.Check(&err)
 
+	apps, err := strconv.Atoi(os.Getenv("APPSTOUSE"));
+	methods.Check(&err)
+
 	ticker := time.NewTicker(time.Duration(waittime) * time.Second)
 	defer ticker.Stop()
 
 	go func() {
 		for range ticker.C {
-			publishedTitlesDiscord, publishedTitlesFacebook := methods.ReadJson()
-			fetchedData := methods.Fetch()
-			fmt.Println("Discord:", publishedTitlesDiscord)
-			fmt.Println("FB: ", publishedTitlesFacebook)
-			methods.SendFacebook(*fetchedData, &publishedTitlesFacebook)
-			methods.SendEmbeds(*fetchedData, &publishedTitlesDiscord)
+			senderFunc(appsToUse(apps))
 		}
 	}()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
+}
+
+func senderFunc(atu appsToUse) {
+	if atu != FACEBOOK && atu != DISCORD && atu != BOTH {
+		panic("Wrong congifs, contact developer or remove .env and start again!")
+	}
+	fetchedData := methods.Fetch()
+	publishedTitlesDiscord, publishedTitlesFacebook := methods.ReadJson()
+	if atu == FACEBOOK || atu == BOTH {
+		fmt.Println("FB: ", publishedTitlesFacebook)
+		methods.SendFacebook(*fetchedData, &publishedTitlesFacebook)
+	}
+	if atu == DISCORD || atu == BOTH {
+		fmt.Println("Discord:", publishedTitlesDiscord)
+		methods.SendEmbeds(*fetchedData, &publishedTitlesDiscord)
+	}
 }
