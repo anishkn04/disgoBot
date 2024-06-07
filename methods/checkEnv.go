@@ -7,7 +7,10 @@ import (
 
 func CheckEnv() {
 	_, err := os.Stat(".env");
-	if err.Error() == "CreateFile .env: The system cannot find the file specified."{
+	if err == nil {
+		return
+	}
+	if err.Error() == "CreateFile .env: The system cannot find the file specified." {
 		fmt.Println("PLEASE REFER TO THE GUIDE IF YOU DO NOT UNDERSTAND SOMETHING: https://github.com/anishkn04/goAppCLI");
 		var botToken string;
 		fmt.Println("Enter Discord Bot Token: ");
