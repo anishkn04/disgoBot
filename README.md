@@ -66,5 +66,5 @@ Additionally, ensure that the events on the website are formatted as follows for
         },
     ]
 }
-
+```
 If you do not want to host the events.json, just create a .json file in same directory and provide that during initial setup.
