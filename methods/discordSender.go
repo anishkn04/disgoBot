@@ -2,6 +2,7 @@ package methods
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/bwmarrin/discordgo"
@@ -24,15 +25,18 @@ func SendEmbeds(fetchedData ResponseBody, title *[]string) {
 		}
 
 		eventBannerURL := "https://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/" + event.Banner
+		evURL, err := url.Parse(eventBannerURL);
+		Check(&err);
+
 		embedMessage := discordgo.MessageEmbed{
 			URL:         event.Link,
-			Image:       &discordgo.MessageEmbedImage{URL: eventBannerURL},
+			Image:       &discordgo.MessageEmbedImage{URL: evURL.String()},
 			Title:       event.Title,
 			Description: event.Description,
 			Timestamp:   event.Start_date,
 		}
 
-		_, err := discord.ChannelMessageSendEmbed(EVENTSCHANNELID, &embedMessage)
+		_, err = discord.ChannelMessageSendEmbed(EVENTSCHANNELID, &embedMessage)
 		Check(&err)
 		if err == nil {
 			writeIntoJson(&event.Title, "discord")

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -24,8 +25,11 @@ func SendFacebook(fetchedData ResponseBody, titles *[]string) {
 		}
 
 		message := fmt.Sprintf("%s\n\nDescription: %s\n\nDate: %s to %s\nLocation: %s", event.Title, event.Description, event.Start_date, event.End_date, event.Location)
+		eventBanner := "https://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/" + event.Banner;
+		evURL, err := url.Parse(eventBanner);
+		Check(&err);
 		postData := map[string]interface{}{
-			"url":          "https://raw.githubusercontent.com/NepalTekComm/nepal-tek-commuity-website/main/" + event.Banner,
+			"url":          evURL.String(),
 			"message":      message,
 			"access_token": pageAccessToken,
 		}
