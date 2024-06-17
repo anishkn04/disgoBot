@@ -1,8 +1,11 @@
 package methods
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func CheckEnv() {
@@ -10,49 +13,59 @@ func CheckEnv() {
 	if err == nil {
 		return
 	}
-	if err.Error() == "CreateFile .env: The system cannot find the file specified." {
+	if os.IsNotExist(err) {
 		var finalString string
 		fmt.Println("PLEASE REFER TO THE GUIDE IF YOU DO NOT UNDERSTAND SOMETHING: https://github.com/anishkn04/goAppCLI")
-		var appsToUse int = 0
-		for {
-			if appsToUse != -1 && appsToUse != 1 && appsToUse != 2 {
-				fmt.Println("Enter 1 if you want to automate for facebook, 2 for discord and -1 for both: ")
-				fmt.Scanln(&appsToUse);
-			} else {
-				break;
-			}
-		}
+
+		fmt.Println("Enter 1 if you want to automate for Facebook, 2 for Discord, and -1 for both: ")
+		appsToUse := getIntInput()
+
 		if appsToUse == 1 || appsToUse == -1 {
-			var pageID string
 			fmt.Println("Enter Facebook Page ID: ")
-			fmt.Scanln(&pageID)
-			var pageAccessToken string
+			pageID := getInput()
+
 			fmt.Println("Enter Facebook Page Access Token: ")
-			fmt.Scanln(&pageAccessToken)
+			pageAccessToken := getInput()
+
 			finalString += fmt.Sprintf("PAGE_ID='%s'\nPAGE_ACCESS_TOKEN='%s'\n", pageID, pageAccessToken)
 		}
 		if appsToUse == 2 || appsToUse == -1 {
-			var botToken string
+
 			fmt.Println("Enter Discord Bot Token: ")
-			fmt.Scanln(&botToken)
-			var channelId string
+			botToken := getInput()
 			fmt.Println("Enter the Channel Id where you want to post changes: ")
-			fmt.Scanln(&channelId)
+			channelId := getInput()
+
 			finalString += fmt.Sprintf("BOTTOKEN='%s'\nCHANNELID='%s'\n", botToken, channelId)
 		}
 
-		var waitTime string
 		fmt.Println("Enter the interval (in seconds) in which you want to check for updates: ")
-		fmt.Scanln(&waitTime)
+		waitTime := getIntInput()
 
-		var eventSite string
 		fmt.Println("Enter the site or file name (relative) with the events data: ")
-		fmt.Scanln(&eventSite)
+		eventSite := getInput()
 
-		finalString += fmt.Sprintf("WAITTIME='%s'\nSITE='%s'\nAPPSTOUSE='%d'", waitTime, eventSite, appsToUse)
+		finalString += fmt.Sprintf("WAITTIME='%d'\nSITE='%s'\nAPPSTOUSE='%d'", waitTime, eventSite, appsToUse)
 
 		err = os.WriteFile(".env", []byte(finalString), 0777)
-		Check(&err)
+		HardCheck(&err)
 	}
-	Check(&err)
+	HardCheck(&err)
+}
+
+func getInput() string {
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	HardCheck(&err)
+	return input
+}
+
+func getIntInput() int {
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	HardCheck(&err)
+	input = strings.TrimSpace(input)
+	intInput, err := strconv.Atoi(input)
+	HardCheck(&err)
+	return intInput
 }
