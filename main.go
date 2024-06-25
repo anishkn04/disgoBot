@@ -13,6 +13,7 @@ import (
 )
 
 type appsToUse int
+
 const (
 	FACEBOOK appsToUse = 1
 	DISCORD  appsToUse = 2
@@ -27,7 +28,7 @@ func main() {
 	waittime, err := strconv.Atoi(os.Getenv("WAITTIME"))
 	methods.Check(&err)
 
-	apps, err := strconv.Atoi(os.Getenv("APPSTOUSE"));
+	apps, err := strconv.Atoi(os.Getenv("APPSTOUSE"))
 	methods.Check(&err)
 
 	ticker := time.NewTicker(time.Duration(waittime) * time.Second)
@@ -46,7 +47,7 @@ func main() {
 
 func senderFunc(atu appsToUse) {
 	if atu != FACEBOOK && atu != DISCORD && atu != BOTH {
-		panic("Wrong congifs, contact developer or remove .env and start again!")
+		panic("Wrong configs, contact developer or remove .env and start again!")
 	}
 	fetchedData := methods.Fetch()
 	publishedTitlesDiscord, publishedTitlesFacebook := methods.ReadJson()
