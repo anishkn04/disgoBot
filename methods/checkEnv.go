@@ -57,7 +57,7 @@ func getInput() string {
 	reader := bufio.NewReader(os.Stdin)
 	input, err := reader.ReadString('\n')
 	HardCheck(&err)
-	return strings.TrimSpace(input)
+	return input
 }
 
 func getIntInput() int {
